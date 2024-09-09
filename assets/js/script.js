@@ -38,6 +38,7 @@ async function getStatus(e) {
         // here we're using the built-in JavaScript error handler to throw a new error but you can see here where it says  
         // 'data.error' that that's the descriptive message from the json that's been returned.
     } else {
+        displayException(data);
         throw new Error(data.error);
     }
 }
@@ -55,6 +56,27 @@ function displayStatus(data) {
 
     //To show the Modal istelf use:
     resultsModal.show();
+}
+
+
+
+
+
+
+function processOptions(form) {
+
+    let optArray = [];
+
+    for (let entry of form.entries()) {
+        if (entry[0] === "options") {
+            optArray.push(entry[1]);
+        }
+    }
+    form.delete("options"); //delete all occurrences of options in our form data
+
+    form.append("options", optArray.join()); //append our new options, using join method to convert it back to a string
+
+    return form;
 }
 
 //Make a POST request to the API:
@@ -91,6 +113,7 @@ async function postForm(e) {
     if (response.ok) {
         displayErrors(data);
     } else {
+        displayException(data);
         throw new Error(data.error);
     }
 }
@@ -116,5 +139,23 @@ function displayErrors(data) {
     document.getElementById("results-content").innerHTML = results;
 
     //To show the Modal istelf use:
+    resultsModal.show();
+}
+
+//Before this function, any exceptions were only displaying in the console.
+// We’ll need to call  our function to display the exception  
+// before the “throw” keyword because all  JavaScript execution stops after a throw.
+// Secondly, we’ll need to create a function,  which we’ll call displayException. 
+// This function will populate the modal with  the exception information and display it.
+function displayException(data) {
+    let heading = `An Exception Occured`;
+
+    results = `<div>The APU returned status code ${data.status_code}</div>`;
+    results += `<div>Error number: <strong>${data.error_no}</strong></div>`;
+    results += `<div>Error text: <strong>${data.error}</strong></div>`
+
+    document.getElementById("resultsModalTitle").innerText = heading;
+    document.getElementById("results-content").innerHTML = results;
+
     resultsModal.show();
 }
